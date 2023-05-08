@@ -1,22 +1,24 @@
-import Header from "components/Layout/Header";
-import avatar from "assets/Avatar.png";
 import KiraButton from "components/Button/KiraButton";
-import { MdAdd, MdSearch, MdRefresh, MdClose } from "react-icons/md";
-import { FaTelegramPlane } from "react-icons/fa";
+import Header from "components/Layout/Header";
+import NoData from "components/Layout/NoData";
+import KiraModal from "components/Modal/KiraModal";
+import NameListTable from "components/Table/NameListTable";
 import KiraTextField from "components/TextField/KiraTextField";
 import { useCallback, useEffect, useState } from "react";
-import NameListTable from "components/Table/NameListTable";
-import KiraModal from "components/Modal/KiraModal";
+import { MdClose, MdAdd, MdRefresh, MdSearch } from "react-icons/md";
+import { FaTelegramPlane } from "react-icons/fa";
+import avatar from "assets/Avatar.png";
 import { fetchUsers } from 'services'
 
 function App() {
-  const [searchValue, setSearchValue] = useState("");
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState([])
+  const [filteredData, setFilteredData] = useState([])
+  const [searchValue, setSearchValue] = useState("");
   const handleTextField = (e) => {
     setSearchValue(e.target.value);
   };
+
   // modal details
   const [selectedUser, setSelectedUser] = useState({});
 
@@ -29,10 +31,13 @@ function App() {
   const handleOpenModal = () => {
     setOpenModal(true);
   };
+
   const handleViewItem = (user) => {
     handleOpenModal();
     setSelectedUser(user);
   };
+
+  // a callback function to call API 
   const fetchApi = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -44,6 +49,7 @@ function App() {
       setIsLoading(false);
     }
   }, []);
+
   useEffect(() => {
     // To filter data based on search value
     const filteredData = data
@@ -64,6 +70,7 @@ function App() {
       });
     setFilteredData(filteredData);
   }, [data, searchValue]);
+
   useEffect(() => {
     const abortController = new AbortController();
     // cleanup on unmount. The API will be called only once onmount
@@ -73,6 +80,7 @@ function App() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <div className="w-full min-w-[370px] min-h-screen bg-kira-background">
       <Header />
@@ -120,7 +128,13 @@ function App() {
             className={`w-full md:w-auto`}
           />
         </div>
-        <NameListTable data={filteredData} handleViewItem={handleViewItem} />
+        {isLoading || !filteredData ? (
+          <p>Loading...</p>
+        ) : filteredData?.length < 1 ? (
+          <NoData />
+        ) : (
+          <NameListTable data={filteredData} handleViewItem={handleViewItem} />
+        )}
         <div className="flex justify-center">
           <KiraButton
             onClick={fetchApi}
@@ -136,7 +150,8 @@ function App() {
         open={openModal}
         onClose={handleCloseModal}
         className={"py-[20px] px-[30px]"}
-      ><div className="space-y-[30px]">
+      >
+        <div className="space-y-[30px]">
           <div className="flex items-center justify-between">
             <h1 className="text-h1">
               {selectedUser?.name?.first} {selectedUser?.name?.last}
@@ -184,7 +199,8 @@ function App() {
               </div>
             ))}
           </div>
-        </div></KiraModal>
+        </div>
+      </KiraModal>
     </div>
   );
 }
