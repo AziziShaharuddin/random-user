@@ -102,6 +102,7 @@ function App() {
         <NameListTable data={data} handleViewItem={handleViewItem} />
         <div className="flex justify-center">
           <KiraButton
+            onClick={fetchApi}
             variant="contained"
             className="gap-x-[14px] text-kira-white"
           >
