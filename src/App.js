@@ -12,6 +12,7 @@ import { fetchUsers } from 'services'
 function App() {
   const [searchValue, setSearchValue] = useState("");
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const handleTextField = (e) => {
     setSearchValue(e.target.value);
@@ -43,6 +44,26 @@ function App() {
       setIsLoading(false);
     }
   }, []);
+  useEffect(() => {
+    // To filter data based on search value
+    const filteredData = data
+      ?.filter((item) => {
+        if (searchValue === "") {
+          return item;
+        } else if (
+          item.name.first
+            .toLowerCase()
+            .includes(searchValue.toLowerCase()) || item.name.last
+              .toLowerCase()
+              .includes(searchValue.toLowerCase())
+        ) {
+          return item;
+        } else {
+          return null;
+        }
+      });
+    setFilteredData(filteredData);
+  }, [data, searchValue]);
   useEffect(() => {
     const abortController = new AbortController();
     // cleanup on unmount. The API will be called only once onmount
@@ -99,7 +120,7 @@ function App() {
             className={`w-full md:w-auto`}
           />
         </div>
-        <NameListTable data={data} handleViewItem={handleViewItem} />
+        <NameListTable data={filteredData} handleViewItem={handleViewItem} />
         <div className="flex justify-center">
           <KiraButton
             onClick={fetchApi}
