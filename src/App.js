@@ -73,9 +73,9 @@ function App() {
 
   useEffect(() => {
     const abortController = new AbortController();
-    // cleanup on unmount. The API will be called only once onmount
+    fetchApi();
+    // cleanup on unmount
     return () => {
-      fetchApi();
       abortController.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
